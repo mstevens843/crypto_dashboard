@@ -18,7 +18,9 @@ from project.models import db, Cryptocurrency, HistoricalData
 db.init_app(app)
 
 # Set the locale for currency formatting
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+import os
+locale.setlocale(locale.LC_ALL, os.environ.get('LC_ALL', 'C.UTF-8'))
+
 
 def format_currency(value):
     return locale.currency(value, grouping=True)
