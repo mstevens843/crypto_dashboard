@@ -25,13 +25,15 @@ migrate = Migrate(app, db)
 # ======== MIGRATIONS ON STARTUP ======== #
 with app.app_context():
     try:
-        print("Running database migrations...")
-        upgrade()
-        print("✅ Database migrations applied successfully.")
+        with open("db/crypto_dashboard_schema.sql", "r") as f:
+            sql_commands = f.read()
+        db.session.execute(sql_commands)
+        db.session.commit()
+        print("✅ Tables created from SQL file.")
     except Exception as e:
-        print(f"❌ Error applying migrations: {e}")
+        print(f"❌ Error running SQL file: {e}")
 
-
+        
 # ======== SET LOCALE ======== #
 try:
     locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
