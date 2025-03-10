@@ -8,7 +8,7 @@ from sqlalchemy import func
 import datetime
 import time
 import os
-from flask_migrate import Migrate  # Import Flask-Migrate
+from flask_migrate import Migrate, upgrade  # Import Flask-Migrate and upgrade
 
 print("Flask app has started!")
 
@@ -21,7 +21,15 @@ from project.models import db, Cryptocurrency, HistoricalData
 db.init_app(app)
 
 # Initialize Flask-Migrate
-migrate = Migrate(app, db)  # Add this after db.init_app(app)
+migrate = Migrate(app, db)
+
+# Run migrations automatically on startup
+with app.app_context():
+    try:
+        upgrade()
+        print("Database migrations applied successfully.")
+    except Exception as e:
+        print(f"Error applying migrations: {e}")
 
 # Set the locale for currency formatting
 try:
