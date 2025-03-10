@@ -8,10 +8,9 @@ class Config:
     )
 
     # ✅ **Fix SSL issue for Render inside the class**
-    if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
-        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
-            "postgres://", "postgresql://"
-        ) + "?sslmode=require"
+    if "render.com" in SQLALCHEMY_DATABASE_URI and "?sslmode=" not in SQLALCHEMY_DATABASE_URI:
+        SQLALCHEMY_DATABASE_URI += "?sslmode=require"
+
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
