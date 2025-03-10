@@ -2,6 +2,7 @@
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.sql import text  # ✅ Import text() to fix SQL execution
 
 # Revision identifiers, used by Alembic
 revision = '20231005_crypto'
@@ -10,7 +11,8 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-    op.execute("""
+    """Apply the migration: Create necessary tables if they don't exist."""
+    op.execute(text("""
     CREATE TABLE IF NOT EXISTS cryptocurrencies (
         id SERIAL PRIMARY KEY,
         coingecko_id VARCHAR(50) UNIQUE NOT NULL,
@@ -23,20 +25,21 @@ def upgrade():
         max_supply DECIMAL(18,0),
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+    """))
 
+    op.execute(text("""
     CREATE TABLE IF NOT EXISTS historical_data (
         id SERIAL PRIMARY KEY,
-        cryptocurrency_id INT REFERENCES cryptocurrencies(id),
+        cryptocurrency_id INT REFERENCES cryptocurrencies(id) ON DELETE CASCADE,
         date DATE NOT NULL,
         price DECIMAL(18,8) NOT NULL,
         market_cap DECIMAL(18,2) NOT NULL,
         volume DECIMAL(18,2) NOT NULL,
         UNIQUE(cryptocurrency_id, date)
     );
-    """)
+    """))
 
 def downgrade():
-    op.execute("""
-    DROP TABLE IF EXISTS historical_data;
-    DROP TABLE IF EXISTS cryptocurrencies;
-    """)
+    """Rollback the migration: Drop tables if needed."""
+    op.execute(text("DROP TABLE IF EXISTS historical_data CASCADE;"))
+    op.execute(text("DROP TABLE IF EXISTS cryptocurrencies CASCADE;"))
