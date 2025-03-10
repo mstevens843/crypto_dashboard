@@ -19,8 +19,12 @@ db.init_app(app)
 
 # Set the locale for currency formatting
 import os
-locale.setlocale(locale.LC_ALL, os.environ.get('LC_ALL', 'C.UTF-8'))
+import locale
 
+try:
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')  # Try setting to en_US.UTF-8
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, 'C')  # Fallback to 'C' locale if unsupported
 
 def format_currency(value):
     return locale.currency(value, grouping=True)
