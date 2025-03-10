@@ -7,6 +7,8 @@ import logging
 from sqlalchemy import func
 import datetime
 import time
+import os
+from flask_migrate import Migrate  # Import Flask-Migrate
 
 print("Flask app has started!")
 
@@ -15,16 +17,18 @@ app.config.from_object(Config)
 
 # Initialize SQLAlchemy with Flask app
 from project.models import db, Cryptocurrency, HistoricalData
+
 db.init_app(app)
 
-# Set the locale for currency formatting
-import os
-import locale
+# Initialize Flask-Migrate
+migrate = Migrate(app, db)  # Add this after db.init_app(app)
 
+# Set the locale for currency formatting
 try:
     locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')  # Try setting to en_US.UTF-8
 except locale.Error:
     locale.setlocale(locale.LC_ALL, 'C')  # Fallback to 'C' locale if unsupported
+
 
 def format_currency(value):
     return locale.currency(value, grouping=True)
