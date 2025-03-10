@@ -4,7 +4,7 @@ class Config:
     # Use the database URL from Render, fallback to local DB if not set
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL",
-        "postgresql://my_crypto_dashboard_user:Qe2kIZPT9mj3kO5vD47qqUaTvRIAQfvd@dpg-cv7dq4d2ng1s7384o710-a/my_crypto_dashboard"
+        "postgresql://my_crypto_dashboard_user:Qe2kIZPT9mj3kO5vD47qqUaTvRIAQfvd@dpg-cv7dq4d2ng1s7384o710-a.oregon-postgres.render.com/my_crypto_dashboard"
     )
 
     # ✅ **Fix SSL issue for Render inside the class**
