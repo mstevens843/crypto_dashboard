@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ currency.name }} Details{% endblock %}
+
+{% block content %}
+    <h1>{{ currency.name }} ({{ currency.symbol }})</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Overview</h2>
+            <p>Current Price: {{ currency.current_price | format_currency }}</p>
+            <p>Market Cap: {{ currency.market_cap | format_currency }}</p>
+            <p>Volume (24h): {{ currency.volume | format_currency }}</p>
+            <p>Circulating Supply: {{ currency.circulating_supply }}</p>
+            <p>Total Supply: {{ currency.total_supply }}</p>
+        </div>
+        <div class="col-md-6">
+            <h2>Historical Data</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Price</th>
+                        <th>Market Cap</th>
+                        <th>Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in historical_data %}
+                    <tr>
+                        <td>{{ data.date }}</td>
+                        <td>{{ data.price | format_currency }}</td>
+                        <td>{{ data.market_cap | format_currency }}</td>
+                        <td>{{ data.volume | format_currency }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Link to Charting library and your custom JS for handling charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

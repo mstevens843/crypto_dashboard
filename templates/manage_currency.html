@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ currency.name if currency else "Add New Currency" }}{% endblock %}
+
+{% block content %}
+    <h1>{{ "Edit" if currency else "Add New" }} Cryptocurrency</h1>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="coingecko_id">CoinGecko ID</label>
+            <p class="text-muted">You can find the CoinGecko ID by visiting the CoinGecko website. Navigate to the specific cryptocurrency's page, and the ID will be part of the URL. For example, in the URL <strong>https://www.coingecko.com/en/coins/bitcoin</strong>, the CoinGecko ID is <strong>bitcoin</strong>.</p>
+            <input type="text" class="form-control" id="coingecko_id" name="coingecko_id" value="{{ currency.coingecko_id if currency else '' }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">{{ "Update" if currency else "Add" }}</button>
+    </form>
+{% endblock %}

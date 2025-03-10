@@ -1,0 +1,56 @@
+/* Main Styles */ 
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: #f4f6f9;
+    color: #2a2a2a;
+    line-height: 1.6;
+    margin: 0; 
+    padding: 0; 
+}
+
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Montserrat', sans-serif;
+    color: #2a2a72;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+a {
+    color: #009ffd;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #2a2a72;
+    text-decoration: underline;
+}
+
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 15px;
+    margin-bottom: 2rem; 
+}
+
+th, td {
+    padding: 0.75rem, 1rem;
+    background: #ffffff;
+    border: none; 
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+thead th {
+    background-color: #2a2a72;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+tr:hover {
+    background-color: #f2f2f2;
+    /* This adds a hover effect for table rows, which can enhance user interaction. */
+}
