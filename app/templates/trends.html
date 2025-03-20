@@ -24,16 +24,30 @@
 
     <!-- Pass the data to charts.js via script tags -->
     <script>
-        const dates = {{ dates | tojson | safe }};
-        const prices = {{ prices | tojson | safe }};
-        const marketCaps = {{ market_caps | tojson | safe }};
-
-        function updateCharts() {
+        async function updateCharts() {
             const selectedCrypto = document.getElementById('cryptoSelect').value;
-            window.location.href = `/trends?crypto=${selectedCrypto}`;
+    
+            // Fetch new data from the backend API
+            const response = await fetch(`/trends/data?crypto=${selectedCrypto}`);
+            const data = await response.json();
+    
+            if (data.error) {
+                console.error("Error fetching data:", data.error);
+                return;
+            }
+    
+            // Update the charts
+            updateChartData(priceChart, data.dates, data.prices);
+            updateChartData(marketCapChart, data.dates, data.market_caps);
+        }
+    
+        function updateChartData(chart, labels, dataset) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = dataset;
+            chart.update();
         }
     </script>
-
+    
     <!-- Inline JavaScript to render the charts -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {

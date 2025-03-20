@@ -1,28 +1,33 @@
 from app.models import db, Cryptocurrency, HistoricalData
 from sqlalchemy import func
-import time  
+import time
+import datetime  
 from app.services.coingecko_service import fetch_historical_data, fetch_top_cryptos  
 from app.utils.helpers import format_date 
 
 def update_cryptocurrencies():
     """Fetch and update the top 10 cryptocurrencies from CoinGecko API."""
-    while True:  # Loop to retry if rate-limited
-        crypto_data = fetch_top_cryptos()  
+    retry_attempts = 3  # Limit retry attempts to avoid infinite loop
 
+    for attempt in range(retry_attempts):
+        crypto_data = fetch_top_cryptos()
         if crypto_data:
             break  # Exit loop if request succeeds
-
-        print("Rate limit exceeded. Pausing for 60 seconds before retrying...")
+        print(f"Rate limit exceeded. Retrying in 60 seconds... (Attempt {attempt + 1}/{retry_attempts})")
         time.sleep(60)  # **Wait before retrying**
+    else:
+        print("❌ Failed to fetch top cryptocurrencies after multiple attempts.")
+        return
 
     existing_cryptos = {c.coingecko_id: c for c in Cryptocurrency.query.all()}
     new_cryptos = []
 
     for coin in crypto_data:
-        print(f"Processing coin: {coin['name']}")
+        print(f"🔄 Processing coin: {coin['name']} ({coin['id']})")
 
         currency = existing_cryptos.get(coin['id'])
         if not currency:
+            print(f"➕ Adding new cryptocurrency: {coin['name']}")
             currency = Cryptocurrency(
                 coingecko_id=coin['id'],
                 name=coin['name'],
@@ -30,32 +35,37 @@ def update_cryptocurrencies():
                 market_cap=coin['market_cap'],
                 volume=coin['total_volume'],
                 circulating_supply=coin['circulating_supply'],
-                total_supply=coin['total_supply'],
-                max_supply=coin['max_supply'],
-                last_updated=func.current_timestamp()
+                total_supply=coin.get('total_supply'),
+                max_supply=coin.get('max_supply'),
+                last_updated=datetime.datetime.utcnow()  # ✅ Fix: Use actual timestamp
             )
             db.session.add(currency)
         else:
+            print(f"🔄 Updating {coin['name']} in database.")
             currency.current_price = coin['current_price']
             currency.market_cap = coin['market_cap']
             currency.volume = coin['total_volume']
             currency.circulating_supply = coin['circulating_supply']
-            currency.total_supply = coin['total_supply']
-            currency.max_supply = coin['max_supply']
-            currency.last_updated = func.current_timestamp()
+            currency.total_supply = coin.get('total_supply')
+            currency.max_supply = coin.get('max_supply')
+            currency.last_updated = datetime.datetime.utcnow()  # ✅ Fix
 
-        # **Fetch historical data for 30 days**
-        update_historical_data(coin['id'], currency.id)
+        new_cryptos.append(currency)
 
-        db.session.commit()  # Commit after processing each coin
+    db.session.commit()  # ✅ Fix: Commit only once after the loop
+    print("✅ Cryptocurrency updates complete.")
+
+    # Fetch historical data
+    for coin in new_cryptos:
+        update_historical_data(coin.coingecko_id, coin.id)
 
 def update_historical_data(coingecko_id, crypto_id):
     """Fetch and store historical market data for a cryptocurrency."""
-    print(f"Fetching historical data for {coingecko_id}...")
+    print(f"📊 Fetching historical data for {coingecko_id}...")
     historical_data = fetch_historical_data(coingecko_id)
 
     if not historical_data or 'prices' not in historical_data:
-        print(f"Failed to fetch historical data for {coingecko_id}.")
+        print(f"❌ No historical data found for {coingecko_id}.")
         return
 
     new_entries = []
@@ -76,25 +86,29 @@ def update_historical_data(coingecko_id, crypto_id):
             ))
 
     if new_entries:
+        print(f"📝 Inserting {len(new_entries)} historical data entries for {coingecko_id}.")
         db.session.bulk_save_objects(new_entries)
         db.session.commit()
     else:
-        print(f"Historical data for {coingecko_id} already up to date.")
+        print(f"✅ Historical data for {coingecko_id} is already up to date.")
 
 def create_tables():
     """Create database tables and populate data if they don't exist."""
-    with db.session.begin():
+    from app import create_app  # ✅ Fix: Import app factory
+
+    app = create_app()
+    with app.app_context():  # ✅ Fix: Ensure app context exists
         db.create_all()
-        print("Tables created.")
+        print("🛠️ Tables created successfully.")
 
         try:
             db.session.execute('SELECT 1')
-            print("Database connection is working.")
+            print("✅ Database connection successful.")
         except Exception as e:
-            print(f"Database connection failed: {e}")
+            print(f"❌ Database connection failed: {e}")
 
         try:
-            print("Populating top 10 cryptocurrencies...")
+            print("📊 Populating top 10 cryptocurrencies...")
             update_cryptocurrencies()
         except Exception as e:
-            print(f"An error occurred when populating cryptocurrencies: {e}")
+            print(f"❌ Error populating cryptocurrencies: {e}")

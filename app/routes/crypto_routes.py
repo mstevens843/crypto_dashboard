@@ -8,6 +8,7 @@ from app.utils.helpers import format_currency, format_date  # Import helper func
 crypto_bp = Blueprint('crypto', __name__)
 
 # Home Page - Displays all cryptocurrencies
+# Home Page - Displays all cryptocurrencies
 @crypto_bp.route('/')
 def index():
     cryptocurrencies = Cryptocurrency.query.all()
@@ -104,7 +105,30 @@ def trends():
 
     # Format historical dates
     dates = [format_date(data.date) for data in historical_data]  # Pass date directly
-    prices = [data.price for data in historical_data]
-    market_caps = [data.market_cap for data in historical_data]
+    prices = [float(data.price) for data in historical_data]
+    market_caps = [float(data.market_cap) for data in historical_data]
 
-    return render_template('trends.html', top_10_cryptos=top_10_cryptos, selected_crypto=selected_crypto, dates=dates, prices=prices, market_caps=market_caps)
+    return render_template('trends.html', top_10_cryptos=top_10_cryptos, selected_crypto=selected_crypto,
+                           dates=dates, prices=prices, market_caps=market_caps)
+
+
+# **New API Route for Dynamic Chart Updates**
+@crypto_bp.route('/trends/data')
+def trends_data():
+    """Return JSON data for the selected cryptocurrency."""
+    selected_crypto = request.args.get('crypto')
+
+    historical_data = (HistoricalData.query
+                       .join(Cryptocurrency)
+                       .filter(Cryptocurrency.coingecko_id == selected_crypto)
+                       .order_by(HistoricalData.date.asc())
+                       .all())
+
+    if not historical_data:
+        return jsonify({'error': 'No historical data found for this cryptocurrency'}), 404
+
+    return jsonify({
+        'dates': [format_date(data.date) for data in historical_data],
+        'prices': [float(data.price) for data in historical_data],
+        'market_caps': [float(data.market_cap) for data in historical_data]
+    })

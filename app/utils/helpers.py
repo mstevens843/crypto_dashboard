@@ -47,8 +47,15 @@ def safe_request(url, params=None, retries=3, wait=5):
 
 def format_date(date_value):
     """Converts a datetime.date or timestamp to a readable date format (YYYY-MM-DD)."""
+    
     if isinstance(date_value, datetime.date):  
-        return date_value.strftime('%Y-%m-%d')  # Directly format date object
+        return date_value.strftime('%Y-%m-%d')  # Format date object
+    
     elif isinstance(date_value, (int, float)):  
-        return datetime.datetime.fromtimestamp(date_value).strftime('%Y-%m-%d')  # Convert timestamp
-    raise ValueError("Unsupported date format provided to format_date")
+        # Convert timestamp if it's in milliseconds (more than year 3000)
+        if date_value > 1e10:  
+            date_value = date_value / 1000  # Convert milliseconds to seconds
+        
+        return datetime.datetime.fromtimestamp(date_value).strftime('%Y-%m-%d')
+
+    raise ValueError(f"❌ Unsupported date format provided: {date_value}")
