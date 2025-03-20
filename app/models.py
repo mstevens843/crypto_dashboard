@@ -17,10 +17,16 @@ class Cryptocurrency(db.Model):
 
 class HistoricalData(db.Model):
     __tablename__ = 'historical_data'
+    
     id = db.Column(db.Integer, primary_key=True)
     cryptocurrency_id = db.Column(db.Integer, db.ForeignKey('cryptocurrencies.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     price = db.Column(db.Numeric(18, 8), nullable=False)
     market_cap = db.Column(db.Numeric(18, 2), nullable=False)
     volume = db.Column(db.Numeric(18, 2), nullable=False)
-    __table_args__ = (db.UniqueConstraint('cryptocurrency_id', 'date'),)
+
+    # ✅ Explicitly name the UNIQUE constraint
+    __table_args__ = (
+        db.UniqueConstraint('cryptocurrency_id', 'date', name='historical_data_cryptocurrency_id_date_key'),
+    )
+
