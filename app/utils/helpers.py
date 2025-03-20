@@ -4,8 +4,11 @@ import datetime
 import requests
 import time
 
-# Set locale for currency formatting
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+# Set locale for currency formatting for render
+try:
+    locale.setlocale(locale.LC_ALL, 'C.UTF-8')  # Use 'C.UTF-8' for better compatibility
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, 'C')  # Fallback if 'C.UTF-8' is unavailable
 
 def format_currency(value):
     """Formats a number as a currency string (e.g., $1,000.00)."""
@@ -49,4 +52,3 @@ def format_date(date_value):
     elif isinstance(date_value, (int, float)):  
         return datetime.datetime.fromtimestamp(date_value).strftime('%Y-%m-%d')  # Convert timestamp
     raise ValueError("Unsupported date format provided to format_date")
-
