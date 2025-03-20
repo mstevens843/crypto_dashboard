@@ -60,7 +60,7 @@ def update_cryptocurrencies():
         update_historical_data(coin.coingecko_id, coin.id)
 
 def update_historical_data(coingecko_id, crypto_id):
-    """Fetch and store historical market data for a cryptocurrency."""
+    """Fetch and store historical market data for a cryptocurrency, ensuring no duplicate entries."""
     print(f"📊 Fetching historical data for {coingecko_id}...")
     historical_data = fetch_historical_data(coingecko_id)
 
@@ -68,29 +68,38 @@ def update_historical_data(coingecko_id, crypto_id):
         print(f"❌ No historical data found for {coingecko_id}.")
         return
 
+    # Fetch existing dates in one query to avoid repeated DB hits
+    existing_dates = {
+        data.date for data in HistoricalData.query.filter_by(cryptocurrency_id=crypto_id).all()
+    }
+
     new_entries = []
     for day_data in historical_data['prices']:
         date = format_date(day_data[0])  
+
+        if date in existing_dates:  # Skip if the date already exists
+            print(f"⚠️ Skipping duplicate entry for {coingecko_id} on {date}.")
+            continue  
+
         price = day_data[1]
         market_cap = next((item[1] for item in historical_data['market_caps'] if item[0] == day_data[0]), None)
         volume = next((item[1] for item in historical_data['total_volumes'] if item[0] == day_data[0]), None)
 
-        existing_data = HistoricalData.query.filter_by(cryptocurrency_id=crypto_id, date=date).first()
-        if not existing_data:
-            new_entries.append(HistoricalData(
-                cryptocurrency_id=crypto_id,
-                date=date,
-                price=price,
-                market_cap=market_cap,
-                volume=volume
-            ))
+        new_entries.append(HistoricalData(
+            cryptocurrency_id=crypto_id,
+            date=date,
+            price=price,
+            market_cap=market_cap,
+            volume=volume
+        ))
 
     if new_entries:
-        print(f"📝 Inserting {len(new_entries)} historical data entries for {coingecko_id}.")
+        print(f"📝 Inserting {len(new_entries)} new historical data entries for {coingecko_id}.")
         db.session.bulk_save_objects(new_entries)
         db.session.commit()
     else:
-        print(f"✅ Historical data for {coingecko_id} is already up to date.")
+        print(f"✅ No new historical data to insert for {coingecko_id}. All entries up-to-date.")
+
 
 def create_tables():
     """Create database tables and populate data if they don't exist."""
