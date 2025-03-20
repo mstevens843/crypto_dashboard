@@ -1,5 +1,5 @@
 from app import db
-from models import Cryptocurrency
+from app.models import Cryptocurrency
 
 try:
     db.session.execute('SELECT 1')

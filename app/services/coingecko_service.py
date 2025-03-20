@@ -12,10 +12,10 @@ def fetch_top_cryptos():
     data = safe_request(COINGECKO_API_URL, params=params)
 
     if not data or not isinstance(data, list):
-        print("❌ Failed to fetch top cryptocurrencies. Using last known data if available.")
+        print("Failed to fetch top cryptocurrencies. Using last known data if available.")
         return []
     
-    print(f"✅ Successfully retrieved {len(data)} cryptocurrencies.")
+    print(f"Successfully retrieved {len(data)} cryptocurrencies.")
     return data
 
 
@@ -27,15 +27,15 @@ def fetch_historical_data(coingecko_id, days=30, retries=3, wait=5):
     for attempt in range(retries):
         data = safe_request(url, params=params)
 
-        # ✅ Validate response
+        # Validate response
         if data and all(key in data for key in ["prices", "market_caps", "total_volumes"]):
-            print(f"✅ Successfully retrieved historical data for {coingecko_id}.")
+            print(f"Successfully retrieved historical data for {coingecko_id}.")
             return data
 
-        print(f"❌ Failed to fetch historical data for {coingecko_id}. Retrying in {wait} seconds... (Attempt {attempt + 1}/{retries})")
+        print(f"Failed to fetch historical data for {coingecko_id}. Retrying in {wait} seconds... (Attempt {attempt + 1}/{retries})")
         time.sleep(wait)
 
-    print(f"❌ Giving up on fetching historical data for {coingecko_id} after {retries} attempts.")
+    print(f"Giving up on fetching historical data for {coingecko_id} after {retries} attempts.")
     return None
 
 
@@ -46,8 +46,8 @@ def fetch_crypto_by_id(coingecko_id):
     data = safe_request(COINGECKO_API_URL, params=params)
 
     if not data or not isinstance(data, list) or len(data) == 0:
-        print(f"❌ Failed to fetch details for {coingecko_id}.")
+        print(f"Failed to fetch details for {coingecko_id}.")
         return None
 
-    print(f"✅ Successfully fetched details for {coingecko_id}.")
+    print(f"Successfully fetched details for {coingecko_id}.")
     return data[0]  # Return the first result if available

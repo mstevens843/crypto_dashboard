@@ -43,9 +43,9 @@ def safe_request(url, params=None, retries=3, wait=5):
             time.sleep(retry_after)
 
         else:
-            print(f"❌ API request failed with status {response.status_code}: {response.text}")
+            print(f"API request failed with status {response.status_code}: {response.text}")
 
-    raise Exception(f"❌ Failed to fetch data from {url} after {retries} retries")
+    raise Exception(f"Failed to fetch data from {url} after {retries} retries")
 
 
 def format_date(date_value):
@@ -61,4 +61,4 @@ def format_date(date_value):
         
         return datetime.datetime.fromtimestamp(date_value).strftime('%Y-%m-%d')
 
-    raise ValueError(f"❌ Unsupported date format provided: {date_value}")
+    raise ValueError(f"Unsupported date format provided: {date_value}")

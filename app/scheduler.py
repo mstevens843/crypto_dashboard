@@ -11,7 +11,7 @@ def scheduled_update():
     print("Fetching latest cryptocurrency data...")
 
     # Ensure Flask app context is properly set
-    app = current_app._get_current_object()  # ✅ Fix: Get Flask app instance
+    app = current_app._get_current_object()  #  Fix: Get Flask app instance
     with app.app_context():
         crypto_data = fetch_top_cryptos()
         update_cryptocurrencies()  # Removed crypto_data argument to match function definition
@@ -33,7 +33,7 @@ def start_scheduler(app):
         scheduler.add_job(scheduled_update, 'interval', minutes=30, id="crypto_update")
 
     # Run an initial update on startup
-    with app.app_context():  # ✅ Fix: Ensures app context exists
+    with app.app_context():  # Fix: Ensures app context exists
         print("Running initial cryptocurrency update on startup...")
         scheduled_update()
 
