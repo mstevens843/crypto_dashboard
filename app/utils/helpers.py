@@ -4,19 +4,12 @@ import datetime
 import requests
 import time
 
-# Set locale for currency formatting for render
-try:
-    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')  # Preferred locale
-except locale.Error:
-    try:
-        locale.setlocale(locale.LC_ALL, 'C.UTF-8')  # Alternative
-    except locale.Error:
-        locale.setlocale(locale.LC_ALL, '')  # System default (if nothing else works)
 
 
 def format_currency(value):
-    """Formats a number as a currency string (e.g., $1,000.00)."""
-    return locale.currency(value, grouping=True)
+    """Formats currency manually instead of using locale.currency()."""
+    return f"${value:,.2f}"
+
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
