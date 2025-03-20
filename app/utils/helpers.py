@@ -6,9 +6,16 @@ import time
 
 # Set locale for currency formatting for render
 try:
-    locale.setlocale(locale.LC_ALL, 'C.UTF-8')  # Use 'C.UTF-8' for better compatibility
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')  # Use a proper locale
 except locale.Error:
-    locale.setlocale(locale.LC_ALL, 'C')  # Fallback if 'C.UTF-8' is unavailable
+    locale.setlocale(locale.LC_ALL, '')  # Use system default if en_US.UTF-8 is unavailable
+
+def format_currency(value):
+    """Format a number as currency, handling locale errors gracefully."""
+    try:
+        return locale.currency(value, grouping=True)
+    except (locale.Error, ValueError, TypeError):
+        return f"${value:,.2f}"  # Fallback manual formatting
 
 def format_currency(value):
     """Formats a number as a currency string (e.g., $1,000.00)."""
