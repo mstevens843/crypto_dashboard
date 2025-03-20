@@ -68,12 +68,16 @@ def update_historical_data(coingecko_id, crypto_id):
         print(f"❌ No historical data found for {coingecko_id}.")
         return
 
-    existing_dates = {data.date for data in HistoricalData.query.filter_by(cryptocurrency_id=crypto_id).all()}  # Fetch existing dates
+    # Fetch only the dates that exist for this cryptocurrency
+    existing_dates = {
+        data.date for data in HistoricalData.query.filter_by(cryptocurrency_id=crypto_id).all()
+    }
 
     new_entries = []
     for day_data in historical_data['prices']:
         date = format_date(day_data[0])  
 
+        # Skip duplicates
         if date in existing_dates:  
             print(f"⚠️ Skipping duplicate entry for {coingecko_id} on {date}.")
             continue  
@@ -93,12 +97,12 @@ def update_historical_data(coingecko_id, crypto_id):
         new_entries.append(entry)
 
     if new_entries:
-        print(f"📝 Merging {len(new_entries)} historical data entries for {coingecko_id}.")
-        for entry in new_entries:
-            db.session.merge(entry)  # ✅ Use merge to prevent duplicates
+        print(f"📝 Inserting {len(new_entries)} new historical data entries for {coingecko_id}.")
+        db.session.bulk_save_objects(new_entries)
         db.session.commit()
     else:
         print(f"✅ No new historical data to insert for {coingecko_id}. All entries up-to-date.")
+
 
 
 
