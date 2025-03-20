@@ -103,13 +103,16 @@ def trends():
                        .order_by(HistoricalData.date.asc())
                        .all())
 
-    # Format historical dates
-    dates = [format_date(data.date) for data in historical_data]  # Pass date directly
+    # Format historical data
+    dates = [data.date.strftime('%Y-%m-%d') for data in historical_data]
     prices = [float(data.price) for data in historical_data]
     market_caps = [float(data.market_cap) for data in historical_data]
 
-    return render_template('trends.html', top_10_cryptos=top_10_cryptos, selected_crypto=selected_crypto,
+    return render_template('trends.html',
+                           top_10_cryptos=top_10_cryptos,
+                           selected_crypto=selected_crypto,
                            dates=dates, prices=prices, market_caps=market_caps)
+
 
 
 # **New API Route for Dynamic Chart Updates**
@@ -128,7 +131,7 @@ def trends_data():
         return jsonify({'error': 'No historical data found for this cryptocurrency'}), 404
 
     return jsonify({
-        'dates': [format_date(data.date) for data in historical_data],
+        'dates': [data.date.strftime('%Y-%m-%d') for data in historical_data],  # Fix date format
         'prices': [float(data.price) for data in historical_data],
         'market_caps': [float(data.market_cap) for data in historical_data]
     })

@@ -24,44 +24,20 @@
 
     <!-- Pass the data to charts.js via script tags -->
     <script>
-        async function updateCharts() {
-            const selectedCrypto = document.getElementById('cryptoSelect').value;
-    
-            // Fetch new data from the backend API
-            const response = await fetch(`/trends/data?crypto=${selectedCrypto}`);
-            const data = await response.json();
-    
-            if (data.error) {
-                console.error("Error fetching data:", data.error);
-                return;
-            }
-    
-            // Update the charts
-            updateChartData(priceChart, data.dates, data.prices);
-            updateChartData(marketCapChart, data.dates, data.market_caps);
-        }
-    
-        function updateChartData(chart, labels, dataset) {
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = dataset;
-            chart.update();
-        }
-    </script>
-    
-    <!-- Inline JavaScript to render the charts -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Move chart variables to global scope to prevent redeclaration issues.
+        let priceChart, marketCapChart;
+
+        document.addEventListener('DOMContentLoaded', function () {
             const priceChartCtx = document.getElementById('priceChart').getContext('2d');
             const marketCapChartCtx = document.getElementById('marketCapChart').getContext('2d');
 
-            // Price Chart
-            new Chart(priceChartCtx, {
+            priceChart = new Chart(priceChartCtx, {
                 type: 'line',
                 data: {
-                    labels: dates,
+                    labels: [],
                     datasets: [{
                         label: 'Price',
-                        data: prices,
+                        data: [],
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1,
                         fill: false
@@ -69,21 +45,18 @@
                 },
                 options: {
                     scales: {
-                        y: {
-                            beginAtZero: false
-                        }
+                        y: { beginAtZero: false }
                     }
                 }
             });
 
-            // Market Cap Chart
-            new Chart(marketCapChartCtx, {
+            marketCapChart = new Chart(marketCapChartCtx, {
                 type: 'line',
                 data: {
-                    labels: dates,
+                    labels: [],
                     datasets: [{
                         label: 'Market Cap',
-                        data: marketCaps,
+                        data: [],
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1,
                         fill: false
@@ -91,12 +64,38 @@
                 },
                 options: {
                     scales: {
-                        y: {
-                            beginAtZero: false
-                        }
+                        y: { beginAtZero: false }
                     }
                 }
             });
+
+            // Load initial data on page load
+            updateCharts();
         });
+
+        async function updateCharts() {
+            const selectedCrypto = document.getElementById('cryptoSelect').value;
+
+            try {
+                const response = await fetch(`/trends/data?crypto=${selectedCrypto}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error("Error fetching data:", data.error);
+                    return;
+                }
+
+                updateChartData(priceChart, data.dates, data.prices);
+                updateChartData(marketCapChart, data.dates, data.market_caps);
+            } catch (error) {
+                console.error("Failed to fetch chart data:", error);
+            }
+        }
+
+        function updateChartData(chart, labels, dataset) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = dataset;
+            chart.update();
+        }
     </script>
 {% endblock %}
