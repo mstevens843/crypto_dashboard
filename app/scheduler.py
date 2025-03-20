@@ -9,8 +9,10 @@ scheduler = BackgroundScheduler()
 def scheduled_update():
     """Fetches the latest cryptocurrency data and updates the database."""
     with current_app.app_context():
+        print("Fetching latest cryptocurrency data...")
         crypto_data = fetch_top_cryptos()
-        update_cryptocurrencies(crypto_data)
+        update_cryptocurrencies()  # Removed crypto_data argument to match function definition
+        print("Cryptocurrency data updated successfully.")
 
 def start_scheduler(app):
     """Starts the background scheduler for periodic cryptocurrency updates."""
