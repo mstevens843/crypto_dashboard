@@ -1,4 +1,4 @@
-#!/Users/development/Desktop/2427_email_hatchways/capstone-project-one-abf8076dc70c48ff8b62544bc1e76312/venv/bin/python3.12
+#!/Users/development/Desktop/crypto_dashboard/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys

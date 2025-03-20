@@ -9,7 +9,7 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
-setenv VIRTUAL_ENV "/Users/development/Desktop/2427_email_hatchways/capstone-project-one-abf8076dc70c48ff8b62544bc1e76312/venv"
+setenv VIRTUAL_ENV "/Users/development/Desktop/crypto_dashboard/venv"
 
 set _OLD_VIRTUAL_PATH="$PATH"
 setenv PATH "$VIRTUAL_ENV/bin:$PATH"

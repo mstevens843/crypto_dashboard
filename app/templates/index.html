@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Cryptocurrency Dashboard
+{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Cryptocurrency Overview</h1>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Current Price</th>
+                <th scope="col">Market Cap</th>
+                <th scope="col">Volume</th>
+                <th scope="col">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Loop through the cryptocurrencies stored in the database -->
+            {% for cryptocurrency in cryptocurrencies %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ cryptocurrency.name }}</td>
+                <td>{{ cryptocurrency.current_price | format_currency }}</td>
+                <td>{{ cryptocurrency.market_cap | format_currency }}</td>
+                <td>{{ cryptocurrency.volume | format_currency }}</td>
+                <td>
+                    <a href="{{ url_for('crypto.currency_detail', coingecko_id=cryptocurrency.coingecko_id) }}" class="btn btn-primary btn-sm" aria-label="View Details About {{ cryptocurrency.name }}">
+                        View Details
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            
+            <!-- NEW: Loop through the API data fetched from CoinGecko -->
+            {% for crypto in api_crypto_data %}
+            <tr>
+                <th scope="row">{{ loop.index + cryptocurrencies|length }}</th> <!-- Adjust index for API data -->
+                <td>{{ crypto.name }}</td>
+                <td>{{ crypto.current_price | format_currency }}</td>
+                <td>{{ crypto.market_cap | format_currency }}</td>
+                <td>{{ crypto.total_volume | format_currency }}</td>
+                <td>
+                    <a href="{{ url_for('crypto.currency_detail', coingecko_id=crypto.id) }}" class="btn btn-primary btn-sm" aria-label="View Details About {{ crypto.name }}">
+                        View Details
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,31 @@
+# Ignore Python virtual environment
+venv/
+.venv/
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore dependency files
+Pipfile
+Pipfile.lock
+poetry.lock
+*.egg-info/
+dist/
+build/
+
+# Ignore database and environment files.git
+*.sqlite3
+*.log
+
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+venv/

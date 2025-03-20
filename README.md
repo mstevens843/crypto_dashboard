@@ -7,7 +7,7 @@ This project is a cryptocurrency market dashboard that provides real-time and hi
 ### Live Site
 
 **Title:** Cryptocurrency Market Dashboard  
-**URL:** [Insert the URL where your project is hosted]
+**URL:** https://crypto-dashboard-0b1k.onrender.com/
 
 ### Features
 
