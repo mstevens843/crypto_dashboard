@@ -4,16 +4,17 @@ COINGECKO_API_URL = "https://api.coingecko.com/api/v3/coins/markets"
 HISTORICAL_DATA_URL = "https://api.coingecko.com/api/v3/coins/{id}/market_chart"
 
 def fetch_top_cryptos():
-    """Fetch top 10 cryptocurrencies from CoinGecko API."""
+    """Fetch top 10 cryptocurrencies from CoinGecko API with rate limit handling."""
     params = {"vs_currency": "usd", "order": "market_cap_desc", "per_page": 10, "page": 1}
     
+    print("Fetching latest cryptocurrency data...")
     data = safe_request(COINGECKO_API_URL, params=params)
     
     if not data:
-        print("❌ Failed to fetch top cryptocurrencies from CoinGecko.")
-    else:
-        print(f"✅ Successfully retrieved {len(data)} cryptocurrencies.")
+        print("❌ Failed to fetch top cryptocurrencies. Using last known data if available.")
+        return []
     
+    print(f"✅ Successfully retrieved {len(data)} cryptocurrencies.")
     return data
 
 def fetch_historical_data(coingecko_id, days=30):

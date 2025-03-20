@@ -19,28 +19,34 @@ def get_logger():
     """Returns a configured logger instance."""
     return logger
 
+
 def safe_request(url, params=None, retries=3, wait=5):
     """
-    Makes a GET request with retry logic.
+    Makes a GET request with retry logic and dynamic wait handling.
 
     - `url`: API endpoint
     - `params`: Query parameters
     - `retries`: Number of retry attempts (default: 3)
-    - `wait`: Time (seconds) between retries (default: 5)
+    - `wait`: Default wait time (seconds) between retries (default: 5)
 
     Returns JSON response or raises an exception.
     """
     for attempt in range(retries):
         response = requests.get(url, params=params)
+
         if response.status_code == 200:
             return response.json()
+        
         elif response.status_code == 429:  # Rate limit exceeded
-            print(f"Rate limit exceeded. Retrying in {wait} seconds...")
-            time.sleep(wait)
-        else:
-            print(f"Request failed with status {response.status_code}: {response.text}")
+            retry_after = int(response.headers.get("Retry-After", wait))  # Use API's suggested wait time
+            print(f"⚠️ Rate limit exceeded. Retrying in {retry_after} seconds... (Attempt {attempt+1}/{retries})")
+            time.sleep(retry_after)
 
-    raise Exception(f"Failed to fetch data from {url} after {retries} retries")
+        else:
+            print(f"❌ API request failed with status {response.status_code}: {response.text}")
+
+    raise Exception(f"❌ Failed to fetch data from {url} after {retries} retries")
+
 
 def format_date(date_value):
     """Converts a datetime.date or timestamp to a readable date format (YYYY-MM-DD)."""
